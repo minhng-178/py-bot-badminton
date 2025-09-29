@@ -9,6 +9,8 @@ import asyncio
 from typing import Optional
 import threading
 from http.server import HTTPServer, BaseHTTPRequestHandler
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
 
 # Load environment variables
@@ -333,7 +335,6 @@ async def status(ctx):
         
     except Exception as e:
         await handle_error(ctx, e, "status")
-
 
 class HealthHandler(BaseHTTPRequestHandler):
     def do_GET(self):
