@@ -7,6 +7,9 @@ import sys
 from datetime import datetime
 import asyncio
 from typing import Optional
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
 
 # Load environment variables
 load_dotenv()
@@ -331,9 +334,38 @@ async def status(ctx):
     except Exception as e:
         await handle_error(ctx, e, "status")
 
+
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/health':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write(b'HDBadminton Bot is running!')
+        else:
+            self.send_response(404)
+            self.end_headers()
+    
+    def log_message(self, format, *args):
+        return  # Suppress HTTP logs
+
+def run_web_server():
+    """Run a simple web server to keep Render service alive"""
+    port = int(os.environ.get('PORT', 8080))
+    server = HTTPServer(('0.0.0.0', port), HealthHandler)
+    logger.info(f"Web server đang chạy trên cổng {port}")
+    server.serve_forever()
+
 # Run the bot
 if __name__ == "__main__":
     try:
+        # Start web server in background thread for Render
+        if os.environ.get('RENDER'):
+            logger.info("Khởi động web server cho Render...")
+            web_thread = threading.Thread(target=run_web_server, daemon=True)
+            web_thread.start()
+        
+        logger.info("🏸 Đang khởi động HDBadminton Bot...")
         bot.run(token, log_handler=None, log_level=logging.INFO)
     except KeyboardInterrupt:
         logger.info("Người dùng yêu cầu tắt bot")

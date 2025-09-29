@@ -153,6 +153,58 @@ hd-badminton-bot/
 - Administrator or "Manage Messages" permission required
 - Automatic command cleanup for cleaner channels
 
+## 🌐 Deployment on Render
+
+This bot is configured for easy deployment on Render using the included Blueprint configuration.
+
+### Quick Deploy Steps
+
+1. **Push to GitHub** (if not done already):
+
+```bash
+git add .
+git commit -m "Add Render deployment configuration"
+git push origin main
+```
+
+2. **Create Blueprint on Render**:
+
+   - Go to [Render Dashboard](https://dashboard.render.com/)
+   - Click "New" → "Blueprint"
+   - **Blueprint Name**: `hdbadminton-bot`
+   - Connect your GitHub repository: `minhng-178/py-bot-badminton`
+   - Select branch: `main`
+
+3. **Set Environment Variables**:
+   After deployment, go to your service dashboard and add:
+
+   - **Key**: `DISCORD_TOKEN`
+   - **Value**: `your_actual_discord_bot_token`
+
+4. **Deploy**: Click "Apply" and wait for deployment to complete
+
+### Alternative: Manual Web Service
+
+If Blueprint doesn't work, create a manual Web Service:
+
+1. **New Web Service** on Render
+2. **Connect GitHub repository**
+3. **Service Settings**:
+
+   - **Name**: `hdbadminton-bot`
+   - **Environment**: `Python 3`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `python main.py`
+   - **Plan**: `Free`
+
+4. **Environment Variables**:
+   - `DISCORD_TOKEN`: Your Discord bot token
+   - `RENDER`: `true`
+
+### Health Check
+
+The bot includes a health check endpoint at `/health` that returns "HDBadminton Bot is running!" to keep the Render service active.
+
 ### Comprehensive Logging
 
 - All activities logged to `discord.log`
